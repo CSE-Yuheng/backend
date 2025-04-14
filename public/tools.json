@@ -1,0 +1,66 @@
+[
+  {
+    "_id": 1,
+    "name": "Choosing a Saw",
+    "price": 0,
+    "brand": "SawGuide",
+    "description": "Tips on selecting the best saw for any project.",
+    "img_name": "images/Choosing a Saw.jpg"
+  },
+  {
+    "_id": 2,
+    "name": "Circular Saw",
+    "price": 99.99,
+    "brand": "SawPro",
+    "description": "Cut through wood, plastic, and more with ease.",
+    "img_name": "images/Circular Saw.jpg"
+  },
+  {
+    "_id": 3,
+    "name": "Cordless Drill",
+    "price": 79.99,
+    "brand": "DrillMaster",
+    "description": "Lightweight yet powerful drill for everyday tasks.",
+    "img_name": "images/Cordless Drill.jpg"
+  },
+  {
+    "_id": 4,
+    "name": "Essential Tools",
+    "price": 29.99,
+    "brand": "ToolEssentials",
+    "description": "A curated set of must-have basics for any toolbox.",
+    "img_name": "images/Essential Tools.jpg"
+  },
+  {
+    "_id": 5,
+    "name": "Hand Tool Set",
+    "price": 49.99,
+    "brand": "HandyKit",
+    "description": "All the essential hand tools in one compact set.",
+    "img_name": "images/Hand Tool Set.jpg"
+  },
+  {
+    "_id": 6,
+    "name": "Tool Safety",
+    "price": 0,
+    "brand": "SafetyFirst",
+    "description": "A helpful guide to safely handling common power tools.",
+    "img_name": "images/Tool Safety.jpg"
+  },
+  {
+    "_id": 7,
+    "name": "Workshop Scene",
+    "price": 0,
+    "brand": "WorkshopShots",
+    "description": "High-resolution shot of a well-organized workshop.",
+    "img_name": "images/Workshop scene.jpg"
+  },
+  {
+    "_id": 8,
+    "name": "Bonus Tools",
+    "price": 59.99,
+    "brand": "ExtraGear",
+    "description": "An additional set of hardware for advanced projects.",
+    "img_name": "images/Hand Tool Set.jpg"
+  }
+]
