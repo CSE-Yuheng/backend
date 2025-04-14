@@ -1,41 +1,70 @@
-// index.js
 const express = require('express');
 const cors = require('cors');
+const Joi = require('joi');
 const path = require('path');
 const fs = require('fs');
 
 const app = express();
-
-// Enable CORS for all routes
 app.use(cors());
+app.use(express.json());
 
-// Define the path to the tools JSON file (located in the public folder)
+// Load existing tools from tools.json
 const toolsFilePath = path.join(__dirname, 'public', 'tools.json');
+let tools = [];
 
-// API endpoint that reads and returns the tools data
-app.get('/api/tools', (req, res) => {
-  fs.readFile(toolsFilePath, 'utf8', (err, data) => {
-    if (err) {
-      console.error('Error reading tools.json:', err);
-      res.status(500).json({ error: 'Failed to read tools data.' });
-    } else {
-      try {
-        const tools = JSON.parse(data);
-        res.json(tools);
-      } catch (parseError) {
-        console.error('Error parsing tools.json:', parseError);
-        res.status(500).json({ error: 'Failed to parse tools data.' });
-      }
+fs.readFile(toolsFilePath, 'utf8', (err, data) => {
+  if (!err) {
+    try {
+      tools = JSON.parse(data);
+    } catch (parseErr) {
+      console.error('Error parsing tools.json:', parseErr);
     }
-  });
+  }
 });
 
-// Serve static assets from the public folder
+// Joi schema for tool validation
+const toolSchema = Joi.object({
+  name: Joi.string().min(3).required(),
+  price: Joi.number().min(0).required(),
+  brand: Joi.string().min(2).required(),
+  description: Joi.string().min(5).required(),
+  img_name: Joi.string().required()
+});
+
+// GET endpoint to retrieve tools
+app.get('/api/tools', (req, res) => {
+  res.json(tools);
+});
+
+// POST endpoint to add a new tool
+app.post('/api/tools', (req, res) => {
+  const { error, value } = toolSchema.validate(req.body);
+  if (error) {
+    return res.status(400).json({ error: error.details[0].message });
+  }
+
+  const newTool = {
+    _id: tools.length ? tools[tools.length - 1]._id + 1 : 1,
+    ...value
+  };
+  tools.push(newTool);
+
+  // Optionally, write the updated tools array back to tools.json
+  fs.writeFile(toolsFilePath, JSON.stringify(tools, null, 2), (writeErr) => {
+    if (writeErr) {
+      console.error('Error writing to tools.json:', writeErr);
+    }
+  });
+
+  res.status(201).json({ message: 'Tool added successfully', tool: newTool });
+});
+
+// Serve static files
 app.use(express.static(path.join(__dirname, 'public')));
 
-// Fallback route (serves index.html) for deep links
+// Fallback route
 app.get('*', (req, res) => {
-  res.sendFile(path.join(__dirname, 'public', 'index.html'));
+  res.sendFile(path.join(__dirname, 'public/index.html'));
 });
 
 // Start the server
