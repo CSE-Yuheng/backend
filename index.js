@@ -1,53 +1,46 @@
-// server/index.js
+// index.js
 const express = require('express');
 const cors = require('cors');
 const path = require('path');
+const fs = require('fs');
 
 const app = express();
 
 // Enable CORS for all routes
 app.use(cors());
 
-// Travel blog posts data (reuse same data structure)
-const posts = [
-  {
-    id: 1,
-    title: "Exploring the Alps",
-    description: "Experience the breathtaking views and alpine culture of the Swiss Alps.",
-    image: "/images/alps.jpg"  // if you plan to serve these images from the server, see below
-  },
-  {
-    id: 2,
-    title: "Beach Paradise in Bali",
-    description: "Discover the tranquil beaches, crystal-clear waters, and vibrant sunsets in Bali.",
-    image: "/images/bali.jpg"
-  },
-  {
-    id: 3,
-    title: "Safari in Serengeti",
-    description: "Join us on a safari through the Serengeti National Park and witness magnificent wildlife.",
-    image: "/images/safari.jpg"
-  }
-];
+// Define the path to the tools JSON file (located in the public folder)
+const toolsFilePath = path.join(__dirname, 'public', 'tools.json');
 
-// Serve API endpoint to return posts
-app.get('/api/posts', (req, res) => {
-  res.json(posts);
+// API endpoint that reads and returns the tools data
+app.get('/api/tools', (req, res) => {
+  fs.readFile(toolsFilePath, 'utf8', (err, data) => {
+    if (err) {
+      console.error('Error reading tools.json:', err);
+      res.status(500).json({ error: 'Failed to read tools data.' });
+    } else {
+      try {
+        const tools = JSON.parse(data);
+        res.json(tools);
+      } catch (parseError) {
+        console.error('Error parsing tools.json:', parseError);
+        res.status(500).json({ error: 'Failed to parse tools data.' });
+      }
+    }
+  });
 });
 
-// Serve static images (if you decide to host images here)
-app.use('/images', express.static(path.join(__dirname, 'images')));
-
-// Serve the documentation page from the public folder
+// Serve static assets from the public folder
 app.use(express.static(path.join(__dirname, 'public')));
 
-// Fallback route for index.html in case of deep linking
+// Fallback route (serves index.html) for deep links
 app.get('*', (req, res) => {
-  res.sendFile(path.join(__dirname, 'public/index.html'));
+  res.sendFile(path.join(__dirname, 'public', 'index.html'));
 });
 
 // Start the server
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {
-  console.log(`Travel Blog API server running on port ${PORT}`);
+  console.log(`ToolHub API server running on port ${PORT}`);
 });
+
