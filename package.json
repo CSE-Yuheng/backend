@@ -1,7 +1,7 @@
 {
-  "name": "travel-blog-api",
+  "name": "toolhub-api",
   "version": "1.0.0",
-  "description": "Backend API for the Travel Blog",
+  "description": "Backend API for ToolHub",
   "main": "index.js",
   "scripts": {
     "start": "node index.js",
@@ -14,6 +14,6 @@
   "devDependencies": {
     "nodemon": "^2.0.22"
   },
-  "author": "",
+  "author": "Yuheng Zhu",
   "license": "ISC"
 }
