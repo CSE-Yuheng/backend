@@ -49,14 +49,53 @@ app.post('/api/tools', (req, res) => {
   };
   tools.push(newTool);
 
-  // Optionally, write the updated tools array back to tools.json
+  // Persist to file
   fs.writeFile(toolsFilePath, JSON.stringify(tools, null, 2), (writeErr) => {
-    if (writeErr) {
-      console.error('Error writing to tools.json:', writeErr);
-    }
+    if (writeErr) console.error('Error writing to tools.json:', writeErr);
   });
 
   res.status(201).json({ message: 'Tool added successfully', tool: newTool });
+});
+
+// PUT endpoint to update an existing tool
+app.put('/api/tools/:id', (req, res) => {
+  const { error, value } = toolSchema.validate(req.body);
+  if (error) {
+    return res.status(400).json({ error: error.details[0].message });
+  }
+
+  const id = parseInt(req.params.id, 10);
+  const tool = tools.find(t => t._id === id);
+  if (!tool) {
+    return res.status(404).json({ error: 'Tool not found' });
+  }
+
+  Object.assign(tool, value);
+
+  // Persist changes
+  fs.writeFile(toolsFilePath, JSON.stringify(tools, null, 2), (writeErr) => {
+    if (writeErr) console.error('Error writing to tools.json:', writeErr);
+  });
+
+  res.json({ message: 'Tool updated successfully', tool });
+});
+
+// DELETE endpoint to remove a tool
+app.delete('/api/tools/:id', (req, res) => {
+  const id = parseInt(req.params.id, 10);
+  const index = tools.findIndex(t => t._id === id);
+  if (index === -1) {
+    return res.status(404).json({ error: 'Tool not found' });
+  }
+
+  tools.splice(index, 1);
+
+  // Persist changes
+  fs.writeFile(toolsFilePath, JSON.stringify(tools, null, 2), (writeErr) => {
+    if (writeErr) console.error('Error writing to tools.json:', writeErr);
+  });
+
+  res.sendStatus(200);
 });
 
 // Serve static files
@@ -72,4 +111,6 @@ const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {
   console.log(`ToolHub API server running on port ${PORT}`);
 });
+
+
 
