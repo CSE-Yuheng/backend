@@ -1,13 +1,5 @@
 [
   {
-    "_id": 1,
-    "name": "Choosing a Saw",
-    "price": 0,
-    "brand": "SawGuide",
-    "description": "Tips on selecting the best saw for any project.",
-    "img_name": "images/Choosing a Saw.jpg"
-  },
-  {
     "_id": 2,
     "name": "Circular Saw",
     "price": 99.99,
