@@ -8,15 +8,15 @@ const Tool     = require('./models/Tool');
 
 const app = express();
 
-// 1️⃣ CORS setup
+// 1️⃣ CORS setup — allow requests from your React dev server
 const corsOptions = {
-  origin: process.env.CLIENT_ORIGIN || 'http://localhost:3000',
+  origin: process.env.CLIENT_ORIGIN || 'http://localhost:3000',  // your front-end URL
   methods: ['GET','POST','PUT','DELETE','OPTIONS'],
   credentials: true,
   optionsSuccessStatus: 200
 };
-app.use(cors(corsOptions));  // apply before your routes
-app.options('*', cors(corsOptions)); // enable pre-flight for all routes
+app.use(cors(corsOptions));          // enable CORS for all routes :contentReference[oaicite:0]{index=0}
+app.options('*', cors(corsOptions)); // enable pre-flight across the board :contentReference[oaicite:1]{index=1}
 
 app.use(express.json());
 
@@ -46,7 +46,7 @@ app.post('/api/tools', async (req, res) => {
   res.status(201).json({ message: 'Tool added successfully', tool: newTool });
 });
 
-// PUT update tool
+// PUT update existing tool
 app.put('/api/tools/:id', async (req, res) => {
   const { error, value } = Tool.validateTool(req.body);
   if (error) return res.status(400).json({ error: error.details[0].message });
@@ -57,7 +57,7 @@ app.put('/api/tools/:id', async (req, res) => {
   res.json({ message: 'Tool updated successfully', tool: updated });
 });
 
-// DELETE remove tool
+// DELETE tool
 app.delete('/api/tools/:id', async (req, res) => {
   const deleted = await Tool.findByIdAndDelete(req.params.id);
   if (!deleted) return res.status(404).json({ error: 'Tool not found' });
