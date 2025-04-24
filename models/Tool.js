@@ -1,8 +1,7 @@
 // models/Tool.js
 const mongoose = require('mongoose');
-const Joi = require('joi');
+const Joi     = require('joi');
 
-// Mongoose schema for a Tool document
 const toolSchema = new mongoose.Schema({
   name:        { type: String, required: true, minlength: 3 },
   price:       { type: Number, required: true, min: 0 },
@@ -11,8 +10,8 @@ const toolSchema = new mongoose.Schema({
   img_name:    { type: String, required: true }
 });
 
-// Joi schema for request validation (reuse in your routes)
-toolSchema.statics.validateTool = (data) => {
+// static for Joi validation
+toolSchema.statics.validateTool = function(data) {
   const schema = Joi.object({
     name:        Joi.string().min(3).required(),
     price:       Joi.number().min(0).required(),
@@ -23,5 +22,4 @@ toolSchema.statics.validateTool = (data) => {
   return schema.validate(data, { abortEarly: false });
 };
 
-const Tool = mongoose.model('Tool', toolSchema);
-module.exports = Tool;
+module.exports = mongoose.model('Tool', toolSchema);

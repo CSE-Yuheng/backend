@@ -1,26 +1,24 @@
 // index.js
-const express = require('express');
-const cors    = require('cors');
+require('dotenv').config();
+const express  = require('express');
+const cors     = require('cors');
 const mongoose = require('mongoose');
-const path    = require('path');
-const Tool    = require('./models/Tool');        // ①
-
-require('dotenv').config(); // if you store your URI in .env
+const path     = require('path');
+const Tool     = require('./models/Tool');   // ①
 
 const app = express();
 app.use(cors());
 app.use(express.json());
 
 // ② Connect to MongoDB Atlas
-//    Make sure you set MONGODB_URI in env or replace process.env.MONGODB_URI
 mongoose.connect(process.env.MONGODB_URI, {
-  useNewUrlParser: true,
+  useNewUrlParser:   true,
   useUnifiedTopology: true
 })
 .then(() => console.log('✅ Connected to MongoDB'))
 .catch(err => console.error('❌ MongoDB connection error:', err));
 
-// ---- CRUD Endpoints, now using Mongoose ----
+// ---- CRUD Endpoints using Mongoose ----
 
 // GET all tools
 app.get('/api/tools', async (req, res) => {
@@ -30,7 +28,6 @@ app.get('/api/tools', async (req, res) => {
 
 // POST add new tool
 app.post('/api/tools', async (req, res) => {
-  // Joi validation via static method
   const { error, value } = Tool.validateTool(req.body);
   if (error) return res.status(400).json({ error: error.details[0].message });
 
@@ -54,14 +51,11 @@ app.put('/api/tools/:id', async (req, res) => {
 app.delete('/api/tools/:id', async (req, res) => {
   const deleted = await Tool.findByIdAndDelete(req.params.id);
   if (!deleted) return res.status(404).json({ error: 'Tool not found' });
-
   res.sendStatus(200);
 });
 
-// Serve static files
+// Serve your React build and public assets
 app.use(express.static(path.join(__dirname, 'public')));
-
-// Fallback
 app.get('*', (req, res) => {
   res.sendFile(path.join(__dirname, 'public/index.html'));
 });
@@ -71,3 +65,4 @@ const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {
   console.log(`ToolHub API server running on port ${PORT}`);
 });
+
