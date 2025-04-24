@@ -8,52 +8,35 @@ const Tool     = require('./models/Tool');
 
 const app = express();
 
-// 1️⃣ Super-permissive CORS — allow all origins, methods & headers
-app.use(cors({
-  origin: '*',
+// ─── 1) ENABLE CORS ────────────────────────────────────────────────────────────
+const corsOptions = {
+  origin: process.env.CLIENT_ORIGIN || 'http://localhost:3000',
   methods: ['GET','POST','PUT','DELETE','OPTIONS'],
-  allowedHeaders: ['Content-Type','Authorization']
-}));
-app.options('*', cors()); // enable pre-flight for all routes
+  credentials: true
+};
+app.use(cors(corsOptions));
+// (optional) handle pre‐flight for all routes
+app.options('*', cors(corsOptions));
 
 app.use(express.json());
 
-// 2️⃣ Connect to MongoDB Atlas
-mongoose
-  .connect(process.env.MONGODB_URI)
+// ─── 2) CONNECT TO MONGODB ────────────────────────────────────────────────────
+mongoose.connect(process.env.MONGODB_URI, { useNewUrlParser: true, useUnifiedTopology: true })
   .then(() => console.log('✅ Connected to MongoDB'))
-  .catch(err => console.error('❌ MongoDB connection error:', err));
+  .catch(err => console.error('❌ MongoDB error:', err));
 
-// 3️⃣ CRUD Endpoints
-app.get(  '/api/tools',       async (req, res) => { const tools = await Tool.find().sort('_id'); res.json(tools); });
-app.post( '/api/tools',       async (req, res) => {
-  const { error, value } = Tool.validateTool(req.body);
-  if (error) return res.status(400).json({ error: error.details[0].message });
-  const newTool = new Tool(value);
-  await newTool.save();
-  res.status(201).json({ message: 'Tool added successfully', tool: newTool });
-});
-app.put(  '/api/tools/:id',   async (req, res) => {
-  const { error, value } = Tool.validateTool(req.body);
-  if (error) return res.status(400).json({ error: error.details[0].message });
-  const updated = await Tool.findByIdAndUpdate(req.params.id, value, { new: true });
-  if (!updated) return res.status(404).json({ error: 'Tool not found' });
-  res.json({ message: 'Tool updated successfully', tool: updated });
-});
-app.delete('/api/tools/:id',   async (req, res) => {
-  const deleted = await Tool.findByIdAndDelete(req.params.id);
-  if (!deleted) return res.status(404).json({ error: 'Tool not found' });
-  res.sendStatus(200);
-});
+// ─── 3) YOUR CRUD ROUTES ──────────────────────────────────────────────────────
+app.get('/api/tools',    /* … */);
+app.post('/api/tools',   /* … */);
+app.put('/api/tools/:id',/* … */);
+app.delete('/api/tools/:id', /* … */);
 
-// 4️⃣ Serve React build & public assets (for production)
+// ─── 4) SERVE FRONT-END ───────────────────────────────────────────────────────
 app.use(express.static(path.join(__dirname, 'public')));
 app.get('*', (req, res) => {
   res.sendFile(path.join(__dirname, 'public/index.html'));
 });
 
-// 5️⃣ Start server
+// ─── 5) START SERVER ──────────────────────────────────────────────────────────
 const PORT = process.env.PORT || 5000;
-app.listen(PORT, () => {
-  console.log(`ToolHub API server running on port ${PORT}`);
-});
+app.listen(PORT, () => console.log(`Listening on port ${PORT}`));
