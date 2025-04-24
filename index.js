@@ -16,6 +16,7 @@ const corsOptions = {
   optionsSuccessStatus: 200
 };
 app.use(cors(corsOptions));  // apply before your routes
+app.options('*', cors(corsOptions)); // enable pre-flight for all routes
 
 app.use(express.json());
 
@@ -28,11 +29,14 @@ mongoose.connect(process.env.MONGODB_URI, {
 .catch(err => console.error('❌ MongoDB connection error:', err));
 
 // 3️⃣ CRUD routes
+
+// GET all tools
 app.get('/api/tools', async (req, res) => {
   const tools = await Tool.find().sort('_id');
   res.json(tools);
 });
 
+// POST add new tool
 app.post('/api/tools', async (req, res) => {
   const { error, value } = Tool.validateTool(req.body);
   if (error) return res.status(400).json({ error: error.details[0].message });
@@ -42,6 +46,7 @@ app.post('/api/tools', async (req, res) => {
   res.status(201).json({ message: 'Tool added successfully', tool: newTool });
 });
 
+// PUT update tool
 app.put('/api/tools/:id', async (req, res) => {
   const { error, value } = Tool.validateTool(req.body);
   if (error) return res.status(400).json({ error: error.details[0].message });
@@ -52,6 +57,7 @@ app.put('/api/tools/:id', async (req, res) => {
   res.json({ message: 'Tool updated successfully', tool: updated });
 });
 
+// DELETE remove tool
 app.delete('/api/tools/:id', async (req, res) => {
   const deleted = await Tool.findByIdAndDelete(req.params.id);
   if (!deleted) return res.status(404).json({ error: 'Tool not found' });
